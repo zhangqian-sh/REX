@@ -39,9 +39,7 @@ def train_model(
         loss_epoch = []
         train_loader = data_loader(dataset, cfg.train.batch_size, True)
         for batch_idx, batch_input in enumerate(train_loader):
-            model, opt_state, loss = batch_iter(
-                cfg, batch_input, model, "train", opt_state=opt_state
-            )
+            model, opt_state, loss = batch_iter(cfg, batch_input, model, opt_state=opt_state)
             logging.info(f"Epoch {epoch}, batch {batch_idx}, loss: {loss:.4e}")
             loss_epoch.append(loss)
         loss = np.mean(loss_epoch)
@@ -51,9 +49,9 @@ def train_model(
             best_loss, best_epoch, best_model = loss, epoch, model
         if epoch % (cfg.train.n_epochs // cfg.train.n_save) == 0:
             eval_loader = data_loader(dataset, cfg.train.batch_size, False)
-            eval_iter = lambda x: batch_iter(cfg, x, model, "eval")
+            eval_iter = lambda x: batch_iter(cfg, x, model)
             eval_output, loss = zip(*map(eval_iter, eval_loader))
-            save_results(cfg, model, eval_output, "eval", epoch=epoch)
+            save_results(cfg, model, eval_output, epoch=epoch)
     model = best_model
     eqx.tree_serialise_leaves(os.path.join(cfg.io.model_folder, "best.eqx"), best_model)
     np.savetxt(f"{cfg.io.result_folder}/loss_history.csv", loss_history, delimiter=",")
@@ -70,7 +68,7 @@ def test_model_and_save_results(
 ):
     logging.info("Start testing")
     eval_loader = data_loader(dataset, cfg.train.batch_size, False)
-    eval_iter = lambda x: batch_iter(cfg, x, model, "test")
+    eval_iter = lambda x: batch_iter(cfg, x, model)
     eval_output, loss = zip(*map(eval_iter, eval_loader))
-    save_results(cfg, model, eval_output, "test")
+    save_results(cfg, model, eval_output)
     logging.info(f"Testing finished. Test loss: {np.mean(loss)}.")
