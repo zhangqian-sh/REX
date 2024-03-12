@@ -13,7 +13,7 @@ def data_loader(data: list[np.ndarray], batch_size: int, shuffle: bool = False):
         return all(x == lst[0] for x in lst)
 
     if not all_equal([len(d) for d in data]):
-        raise ValueError("All data should have the same length")
+        raise ValueError(f"All data should have the same length, got {[len(d) for d in data]}.")
     N = len(data[0])
 
     idx = np.random.permutation(N) if shuffle else np.arange(N)
