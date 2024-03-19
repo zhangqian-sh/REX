@@ -39,7 +39,13 @@ def load_config_from_file(config_path: str):
 
 def setup_output_folder(cfg: dict):
     cfg.io.train_data_path = os.path.join(cfg.io.root_folder, cfg.io.train_data_path)
-    cfg.io.test_data_path = os.path.join(cfg.io.root_folder, cfg.io.test_data_path)
+    if isinstance(cfg.io.test_data_path, str):
+        cfg.io.test_data_path = os.path.join(cfg.io.root_folder, cfg.io.test_data_path)
+    elif isinstance(cfg.io.test_data_path, dict) or isinstance(cfg.io.test_data_path, ConfigDict):
+        for key in cfg.io.test_data_path:
+            cfg.io.test_data_path[key] = os.path.join(cfg.io.root_folder, cfg.io.test_data_path[key])
+    else:
+        raise ValueError(f"cfg.io.test_data_path should be either str or dict, got {type(cfg.io.test_data_path)}")
     cfg.io.result_folder = os.path.join(cfg.io.root_folder, cfg.io.result_folder, cfg.task.name)
     cfg.test.model_path = os.path.join(cfg.io.result_folder, cfg.test.model_path)
     cfg.io.result_folder = cfg.io.result_folder
