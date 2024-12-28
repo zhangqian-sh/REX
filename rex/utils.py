@@ -1,5 +1,6 @@
 import os
 import time
+from datetime import datetime
 
 import h5py
 import numpy as np
@@ -12,8 +13,7 @@ from ml_collections import ConfigDict
 
 class CustomPythonFormatter(logging.PythonFormatter):
     def format(self, record):
-        time_tuple = time.localtime(record.created)
-        time_str = time.strftime("%Y-%m-%d %H:%M:%S", time_tuple)
+        time_str = datetime.now().strftime("%Y%m%d-%H:%M:%S.%f")
         info_level = logging.converter.get_initial_for_level(record.levelno)
         prefix = f"{info_level} {time_str} {record.filename}:{record.lineno}] "
         return prefix + super(logging.PythonFormatter, self).format(record)
